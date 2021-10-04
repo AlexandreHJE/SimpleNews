@@ -8,6 +8,18 @@
 import Foundation
 import RealmSwift
 
+struct NewsResults: Decodable {
+    let articles: [Article]
+    enum CodingKeys: String, CodingKey {
+        case articles
+    }
+    init(from decoder: Decoder) throws {
+        let value = try decoder.container(keyedBy: CodingKeys.self)
+        let articles = try value.decode([Article].self, forKey: .articles)
+        self.articles = articles
+    }
+}
+
 class Article: Object, Decodable {
     @objc dynamic var title: String = ""
     @objc dynamic var thumbnailUrl: String = ""
@@ -17,7 +29,7 @@ class Article: Object, Decodable {
     }
     
     enum CodingKeys: String, CodingKey {
-        case title
+        case title = "title"
         case thumbnailUrl = "urlToImage"
     }
     

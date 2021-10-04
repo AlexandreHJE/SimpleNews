@@ -24,22 +24,23 @@ class ViewController: UIViewController {
     } ()
     
     var disposeBag = DisposeBag()
-    var vm: ArticlesListViewModel
+    var vm: ArticlesListViewModel = ArticlesListViewModel(articlesListProvider: MoyaProvider<ArticlesListService>(), realm: try! Realm())
     let cellID: String = "ArticleCell"
     
-    init(vm: ArticlesListViewModel) {
-        self.vm = vm
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("ArticleList VC hasn't been initialized...")
-    }
+//    init(vm: ArticlesListViewModel) {
+//        self.vm = vm
+//        super.init(nibName: nil, bundle: nil)
+//    }
+//    
+//    required init?(coder: NSCoder) {
+//        fatalError("ArticleList VC hasn't been initialized...")
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
         setupViewModel()
+        vmCB()
     }
     
     private func setupViewModel() {
@@ -68,32 +69,15 @@ class ViewController: UIViewController {
         self.tableView.estimatedRowHeight = 70
     }
     
+    private func vmCB() {
+        vm.onArticles
+            .subscribe()
+            .disposed(by: disposeBag)
+    }
 }
 
 extension ViewController: UITableViewDelegate {
     func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
         return 60.0
-    }
-}
-
-// MARK: DI
-extension ViewController {
-    
-    struct AssistedFactory: Cleanse.AssistedFactory {
-        typealias Seed = Article
-        typealias Element = ViewController
-    }
-    
-    struct Module: Cleanse.Module {
-        
-        static func configure(binder: SingletonBinder) {
-            binder.bind(ViewController.self)
-                .intoCollection()
-//                .to(factory: { (articlesListViewModel: ...)
-//                    ViewController(vm: ArticlesListViewModel.init(articlesListProvider: MoyaProvider<ArticlesListService>.self), realm: <#T##Realm#>))
-//                    ViewController(vm: ArticlesListViewModel.init(articlesListProvider: $0.get(), realm: <#Realm#>))
-                })
-        }
-        
     }
 }
